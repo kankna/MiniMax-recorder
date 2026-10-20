@@ -7,6 +7,8 @@ interface CaptureItemProps {
   capture: Capture;
   selectable?: boolean;
   selected?: boolean;
+  /** 刚写入的那一条：给它一个"落笔"的动效 */
+  land?: boolean;
   onOpen?: () => void;
   onToggle?: () => void;
   onDelete?: () => void;
@@ -17,6 +19,7 @@ export function CaptureItem({
   capture,
   selectable,
   selected,
+  land,
   onOpen,
   onToggle,
   onDelete,
@@ -28,7 +31,9 @@ export function CaptureItem({
     <SwipeRow onDelete={onDelete} onLongPress={onLongPress}>
       <button
         onClick={selectable ? onToggle : onOpen}
-        className="flex w-full items-start gap-3 px-5 py-3 text-left"
+        className={`flex w-full items-start gap-3 px-5 py-3 text-left ${
+          land ? 'capture-land' : ''
+        }`}
       >
         {selectable && (
           <span

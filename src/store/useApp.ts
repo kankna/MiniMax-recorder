@@ -25,6 +25,8 @@ interface AppState {
   toasts: Toast[];
   /** 多选模式（速记 → 转笔记） */
   selection: Set<string>;
+  /** 刚写入的那条速记，用来给它一个"落笔"的动效 */
+  lastCaptureId: string | null;
   ready: boolean;
 
   navigate: (route: Route, replace?: boolean) => void;
@@ -37,6 +39,8 @@ interface AppState {
   toggleSelect: (id: string) => void;
   clearSelection: () => void;
   setSelection: (ids: string[]) => void;
+  markCaptured: (id: string) => void;
+  clearCaptured: () => void;
 }
 
 let toastSeq = 0;
@@ -47,6 +51,7 @@ export const useApp = create<AppState>((set, get) => ({
   settings: null,
   toasts: [],
   selection: new Set<string>(),
+  lastCaptureId: null,
   ready: false,
 
   navigate: (route, replace = false) =>
@@ -115,6 +120,10 @@ export const useApp = create<AppState>((set, get) => ({
   clearSelection: () => set({ selection: new Set<string>() }),
 
   setSelection: (ids) => set({ selection: new Set(ids) }),
+
+  markCaptured: (id) => set({ lastCaptureId: id }),
+
+  clearCaptured: () => set({ lastCaptureId: null }),
 }));
 
 /* ------------------------------------------------------------ 主题落地 */

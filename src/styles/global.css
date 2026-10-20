@@ -210,6 +210,13 @@
     scrollbar-width: none;
   }
 
+  /* —— 触屏设备上藏掉键盘相关的提示：手机上没有 Shift 键 —— */
+  @media (pointer: coarse), (hover: none) {
+    .only-desktop {
+      display: none !important;
+    }
+  }
+
   /* —— 正文排版：编辑体 + 档案气质 —— */
   .prose-arc > * + * {
     margin-top: 0.85em;
@@ -355,8 +362,96 @@
   }
   to {
     opacity: 0;
-    transform: translateY(-16px);
+    transform: translateY(-14px) scale(0.98);
   }
+}
+
+/* 落笔：一条速记刚写进纸里的那一下 */
+@keyframes land {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.97);
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ink-fade {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* 送出去时，笔尖在纸面上划过一道 */
+@keyframes ink-sweep {
+  0% {
+    transform: scaleX(0);
+    opacity: 1;
+  }
+  55% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+
+@keyframes pop-check {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.18);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.capture-land,
+.stagger > .capture-land {
+  animation: land 520ms var(--ease-out-soft) both;
+  position: relative;
+}
+
+.capture-land::after,
+.stagger > .capture-land::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--c-accent) 15%, transparent);
+  animation: ink-fade 1200ms var(--ease-out-soft) both;
+  pointer-events: none;
+}
+
+.send-sweep::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--c-accent);
+  transform-origin: left center;
+  animation: ink-sweep 460ms var(--ease-out-soft) both;
+  pointer-events: none;
+}
+
+.sent-check {
+  animation: pop-check 340ms var(--ease-out-soft) both;
 }
 
 @keyframes shimmer {

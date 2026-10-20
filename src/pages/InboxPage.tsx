@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
 import {
@@ -24,6 +24,8 @@ export function InboxPage() {
   const toast = useApp((s) => s.toast);
   const settings = useApp((s) => s.settings);
   const selection = useApp((s) => s.selection);
+  const lastCaptureId = useApp((s) => s.lastCaptureId);
+  const clearCaptured = useApp((s) => s.clearCaptured);
   const toggleSelect = useApp((s) => s.toggleSelect);
   const clearSelection = useApp((s) => s.clearSelection);
 
@@ -40,6 +42,13 @@ export function InboxPage() {
   const [promoting, setPromoting] = useState<Capture[]>([]);
 
   const captures = useMemo(() => (all ?? []).filter((c) => c.status !== 'archived'), [all]);
+
+  // 落笔动效只演一次，演完就摘掉，免得来回切页时重播
+  useEffect(() => {
+    if (!lastCaptureId) return;
+    const t = window.setTimeout(() => clearCaptured(), 1500);
+    return () => window.clearTimeout(t);
+  }, [lastCaptureId, clearCaptured]);
 
   const groups = useMemo(() => {
     const map = new Map<string, Capture[]>();
@@ -110,9 +119,12 @@ export function InboxPage() {
   return (
     <div className="pb-32">
       <Masthead
-        kicker="私人档案 · Private Archive"
+        kicker="Recorder"
         title={`${new Date().getFullYear()}年${new Date().getMonth() + 1}月${new Date().getDate()}日`}
-        subtitle={`${weekdayOf(today)} · 今天记了 ${captures.filter((c) => dayKeyOf(c.createdAt) === today).length} 条`}
+        subtitle={`${weekdayOf(today)} · 今天记了 ${
+          captures.filter((c) => dayKeyOf(c.createdAt) === today).length
+        } 条`}
+        nowrap
         right={
           <>
             <IconButton
@@ -172,6 +184,7 @@ export function InboxPage() {
                   <CaptureItem
                     key={c.id}
                     capture={c}
+                    land={c.id === lastCaptureId}
                     selectable={selectMode}
                     selected={selection.has(c.id)}
                     onToggle={() => toggleSelect(c.id)}

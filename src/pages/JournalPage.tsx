@@ -75,7 +75,7 @@ export function JournalPage() {
   return (
     <div className="pb-32">
       <Masthead
-        kicker="Ⅱ · 日志"
+        kicker="Journal"
         title="日志"
         subtitle={streak > 0 ? `连续写了 ${streak} 天` : '每天 5 分钟'}
         right={

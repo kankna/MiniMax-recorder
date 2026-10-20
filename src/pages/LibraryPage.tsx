@@ -43,7 +43,7 @@ export function LibraryPage() {
   return (
     <div className="pb-32">
       <Masthead
-        kicker="Ⅲ · 知识库"
+        kicker="Library"
         title="库"
         subtitle={`${(notes ?? []).filter((n) => n.status === 'active').length} 条笔记在册`}
         right={

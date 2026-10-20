@@ -86,6 +86,7 @@ export function AiReviewPage() {
     <div className="pb-32">
       <Masthead
         onBack={back}
+        kicker="AI Review"
         title="AI 整理"
         subtitle="它只提议，你来定"
       />
