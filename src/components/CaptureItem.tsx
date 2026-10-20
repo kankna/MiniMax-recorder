@@ -1,5 +1,6 @@
 import type { Capture } from '../db/types';
 import { fmtTime } from '../lib/date';
+import { haptics } from '../lib/haptics';
 import { SwipeRow } from './SwipeRow';
 import { Icon } from './Icons';
 
@@ -30,8 +31,12 @@ export function CaptureItem({
   return (
     <SwipeRow onDelete={onDelete} onLongPress={onLongPress}>
       <button
-        onClick={selectable ? onToggle : onOpen}
-        className={`flex w-full items-start gap-3 px-5 py-3 text-left ${
+        onClick={() => {
+          haptics.tap();
+          if (selectable) onToggle?.();
+          else onOpen?.();
+        }}
+        className={`row-tap flex w-full items-start gap-3 px-5 py-3 text-left ${
           land ? 'capture-land' : ''
         }`}
       >

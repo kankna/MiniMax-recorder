@@ -80,13 +80,13 @@ export function SearchPage() {
 
       {!query && (
         <EmptyState
-          quote="想不起来写在哪了？搜关键词。"
-          hint="标题、正文、标签、原始速记，都能搜。"
+          quote="想不起来写在哪了？搜关键词"
+          hint="标题、正文、标签、原始速记，都能搜"
         />
       )}
 
       {query && total === 0 && (
-        <EmptyState quote="没有找到。" hint="换个词试试，或者少打几个字。" />
+        <EmptyState quote="没有找到" hint="换个词试试，或者少打几个字" />
       )}
 
       {results.captures.length > 0 && (

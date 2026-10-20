@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Icon } from './Icons';
+import { haptics } from '../lib/haptics';
 
 interface MastheadProps {
   kicker?: string;
@@ -77,7 +78,10 @@ export function IconButton({
 }) {
   return (
     <button
-      onClick={onClick}
+      onClick={() => {
+        haptics.tap();
+        onClick();
+      }}
       aria-label={label}
       title={label}
       className={`tap grid h-10 w-10 place-items-center rounded-full transition-colors ${

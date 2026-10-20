@@ -21,6 +21,7 @@ export default function App() {
   const loadSettings = useApp((s) => s.loadSettings);
   const toast = useApp((s) => s.toast);
   const theme = useApp((s) => s.settings?.theme);
+  const dir = useApp((s) => s.dir);
 
   const [dbOk] = useState(isIndexedDbAvailable());
   const [needRefresh, setNeedRefresh] = useState(false);
@@ -114,7 +115,10 @@ export default function App() {
   return (
     <div className="min-h-[100dvh] bg-paper">
       <main className="shell min-h-[100dvh]">
-        <div key={routeKey(route)} className="animate-settle">
+        <div
+          key={routeKey(route)}
+          className={dir === 'back' ? 'animate-enter-back' : 'animate-enter'}
+        >
           {renderRoute(route)}
         </div>
       </main>

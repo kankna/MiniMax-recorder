@@ -27,6 +27,8 @@ interface AppState {
   selection: Set<string>;
   /** 刚写入的那条速记，用来给它一个"落笔"的动效 */
   lastCaptureId: string | null;
+  /** 导航方向：进还是退。用来决定切页动效往哪边走 */
+  dir: 'fwd' | 'back';
   ready: boolean;
 
   navigate: (route: Route, replace?: boolean) => void;
@@ -52,19 +54,25 @@ export const useApp = create<AppState>((set, get) => ({
   toasts: [],
   selection: new Set<string>(),
   lastCaptureId: null,
+  dir: 'fwd',
   ready: false,
 
   navigate: (route, replace = false) =>
     set((s) => ({
       route,
       history: replace ? s.history : [...s.history, s.route].slice(-20),
+      dir: 'fwd',
     })),
 
   back: () =>
     set((s) => {
       const history = [...s.history];
       const prev = history.pop();
-      return { history, route: prev ?? { name: 'inbox' } };
+      return {
+        history,
+        route: prev ?? { name: 'inbox' },
+        dir: 'back',
+      };
     }),
 
   loadSettings: async () => {

@@ -1,83 +1,97 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
 import type { Journal } from '../db/types';
-import { dayKey, fmtDateLong, relativeDay, todayKey, weekdayOf } from '../lib/date';
+import { dayKey, fmtDateLong, fmtDateShort, relativeDay, todayKey, weekdayOf } from '../lib/date';
 import { useApp } from '../store/useApp';
+import { haptics } from '../lib/haptics';
 import { Masthead, IconButton } from '../components/Masthead';
 import { EmptyState } from '../components/EmptyState';
+import { Sheet } from '../components/Sheet';
 import { Icon } from '../components/Icons';
+
+/** 这一天到底写了没有 */
+function hasContent(j: Journal): boolean {
+  const s = j.sections;
+  return !!(
+    s.keyFinding?.trim() ||
+    s.learned?.trim() ||
+    s.problems?.trim() ||
+    s.tomorrow?.trim() ||
+    (s.done ?? []).some((d) => d.trim())
+  );
+}
+
+function summaryOf(j: Journal): string {
+  const s = j.sections;
+  return (
+    s.keyFinding?.trim() ||
+    s.learned?.trim() ||
+    s.problems?.trim() ||
+    (s.done ?? []).filter(Boolean).join('；') ||
+    s.tomorrow?.trim() ||
+    ''
+  );
+}
 
 export function JournalPage() {
   const navigate = useApp((s) => s.navigate);
   const journals = useLiveQuery(() => db.journals.toArray(), []);
   const today = todayKey();
+  const [pickOpen, setPickOpen] = useState(false);
 
-  const byDate = useMemo(() => {
-    const m = new Map<string, Journal>();
-    for (const j of journals ?? []) m.set(j.date, j);
-    return m;
-  }, [journals]);
+  /** 只留写过的 */
+  const written = useMemo(
+    () =>
+      (journals ?? [])
+        .filter(hasContent)
+        .sort((a, b) => b.date.localeCompare(a.date)),
+    [journals],
+  );
+
+  const months = useMemo(() => {
+    const map = new Map<string, Journal[]>();
+    for (const j of written) {
+      const key = j.date.slice(0, 7);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(j);
+    }
+    return [...map.entries()];
+  }, [written]);
 
   const streak = useMemo(() => {
     let n = 0;
     let d = today;
-    // 今天没写不算断，从昨天开始数
-    if (!byDate.has(d)) d = dayKey(new Date(Date.now() - 86400000));
-    while (byDate.has(d) && n < 400) {
+    if (!written.some((j) => j.date === d)) {
+      d = dayKey(new Date(Date.now() - 86400000));
+    }
+    while (written.some((j) => j.date === d) && n < 400) {
       n++;
-      d = dayKey(new Date(new Date(d).getTime() - 86400000));
+      d = dayKey(new Date(Date.now() - n * 86400000));
     }
     return n;
-  }, [byDate, today]);
+  }, [written, today]);
 
-  const recent = useMemo(() => {
-    const out: {
-      date: string;
-      summary: string;
-      written: boolean;
-      recent: boolean;
-    }[] = [];
-    for (let i = 0; i < 30; i++) {
+  /** 最近两周里空着的日子 —— 只在"补一个"里出现，不铺在主列表上 */
+  const missed = useMemo(() => {
+    const have = new Set((journals ?? []).map((j) => j.date));
+    const out: string[] = [];
+    for (let i = 1; i <= 14; i++) {
       const d = dayKey(new Date(Date.now() - i * 86400000));
-      const j = byDate.get(d);
-      const s = j?.sections;
-      const bits = [
-        s?.keyFinding?.trim(),
-        s?.learned?.trim(),
-        (s?.done ?? []).filter(Boolean).join('；'),
-      ].filter(Boolean);
-      out.push({
-        date: d,
-        summary: bits.length ? bits.join(' · ').slice(0, 80) : '',
-        written: !!j && bits.length > 0,
-        recent: i < 7,
-      });
+      if (!have.has(d)) out.push(d);
     }
     return out;
-  }, [byDate]);
+  }, [journals]);
 
-  const older = useMemo(() => {
-    const known = new Set((journals ?? []).map((j) => j.date));
-    return (journals ?? [])
-      .filter((j) => !recent.some((r) => r.date === j.date) && known.has(j.date))
-      .sort((a, b) => b.date.localeCompare(a.date));
-  }, [journals, recent]);
-
-  const todayJournal = byDate.get(today);
-  const todayFilled = !!(
-    todayJournal &&
-    (todayJournal.sections.keyFinding ||
-      todayJournal.sections.learned ||
-      (todayJournal.sections.done ?? []).filter(Boolean).length)
-  );
+  const todayJournal = (journals ?? []).find((j) => j.date === today);
+  const todayFilled = todayJournal ? hasContent(todayJournal) : false;
 
   return (
     <div className="pb-32">
       <Masthead
         kicker="Journal"
         title="日志"
-        subtitle={streak > 0 ? `连续写了 ${streak} 天` : '每天 5 分钟'}
+        subtitle={streak > 0 ? `连续写了 ${streak} 天` : '一天五分钟，写几笔就好'}
         right={
           <>
             <IconButton
@@ -94,11 +108,14 @@ export function JournalPage() {
         }
       />
 
-      {/* 今日卡片 */}
+      {/* 今天 */}
       <div className="px-4">
         <button
-          onClick={() => navigate({ name: 'journalEntry', date: today })}
-          className="tap margin-rule card w-full overflow-hidden px-4 py-4 pl-5 text-left"
+          onClick={() => {
+            haptics.tap();
+            navigate({ name: 'journalEntry', date: today });
+          }}
+          className="margin-rule card row-tap w-full overflow-hidden px-4 py-4 pl-5 text-left"
         >
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -108,95 +125,114 @@ export function JournalPage() {
               </div>
               <div className="mt-0.5 text-small text-ink-3">{weekdayOf(today)}</div>
             </div>
-            <span
-              className={`mt-1 shrink-0 rounded-full px-2.5 py-1 text-[11px] ${
-                todayFilled
-                  ? 'bg-accent-soft text-accent'
-                  : 'bg-rule/50 text-ink-3'
-              }`}
-            >
-              {todayFilled ? '已写' : '待写'}
-            </span>
+            {todayFilled ? (
+              <span className="mt-1 shrink-0 rounded-full bg-accent-soft px-2.5 py-1 text-[11px] text-accent">
+                已写
+              </span>
+            ) : null}
           </div>
           {todayFilled ? (
             <p className="mt-3 line-clamp-2 text-small text-ink-2">
-              {todayJournal?.sections.keyFinding || todayJournal?.sections.learned}
+              {summaryOf(todayJournal!)}
             </p>
           ) : (
-            <p className="mt-3 text-small text-ink-3">
-              五个格子，五分钟。写完就走。
-            </p>
+            <p className="mt-3 text-small text-ink-3">五格纸，写几笔就好</p>
           )}
         </button>
       </div>
 
-      {/* 近 30 天 */}
-      <div className="mt-6 px-5">
-        <span className="caps">最近三十天</span>
-      </div>
-      <div className="mt-2">
-        {recent.map((r) => (
-          <button
-            key={r.date}
-            onClick={() => navigate({ name: 'journalEntry', date: r.date })}
-            className="tap flex w-full items-center gap-3.5 border-b border-rule px-5 py-3.5 text-left"
-          >
-            <span className="editorial w-[74px] shrink-0 text-[14px] font-normal tabular-nums text-ink-2">
-              {relativeDay(r.date)}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span
-                className={`block truncate text-small ${
-                  r.written ? 'text-ink' : 'text-ink-3/70'
-                }`}
-              >
-                {r.summary || (r.written ? '（空）' : '—')}
-              </span>
-            </span>
-            {!r.written && r.recent && (
-              <span className="shrink-0 rounded-full border border-dashed border-rule-2 px-2 py-0.5 text-[11px] text-ink-3">
-                补写
-              </span>
-            )}
-            <Icon name="right" size={15} className="shrink-0 text-ink-3" />
-          </button>
-        ))}
-      </div>
-
-      {older.length > 0 && (
+      {/* 写过的日子 */}
+      {written.length > 0 ? (
         <>
-          <div className="mt-6 px-5">
-            <span className="caps">更早</span>
+          <div className="mt-7 px-5">
+            <span className="caps">写过 {written.length} 天</span>
           </div>
-          <div>
-            {older.map((j) => (
-              <button
-                key={j.date}
-                onClick={() => navigate({ name: 'journalEntry', date: j.date })}
-                className="tap flex w-full items-center gap-3.5 border-b border-rule px-5 py-3.5 text-left"
-              >
-                <span className="editorial w-[74px] shrink-0 text-[14px] tabular-nums text-ink-2">
-                  {j.date.slice(5)}
-                </span>
-                <span className="min-w-0 flex-1 truncate text-small text-ink-2">
-                  {j.sections.keyFinding ||
-                    j.sections.learned ||
-                    (j.sections.done ?? []).filter(Boolean).join('；') ||
-                    '（空）'}
-                </span>
-                <Icon name="right" size={15} className="shrink-0 text-ink-3" />
-              </button>
-            ))}
-          </div>
+          {months.map(([key, items]) => (
+            <section key={key}>
+              <div className="px-5 pt-4 pb-1 text-[13px] text-ink-2">
+                {Number(key.slice(5))}月
+              </div>
+              {items.map((j) => (
+                <button
+                  key={j.date}
+                  onClick={() => {
+                    haptics.tap();
+                    navigate({ name: 'journalEntry', date: j.date });
+                  }}
+                  className="row-tap block w-full border-b border-rule px-5 py-3.5 text-left"
+                >
+                  <div className="flex items-baseline gap-2.5">
+                    <span className="editorial text-[15px] text-ink">
+                      {fmtDateShort(j.date)}
+                    </span>
+                    <span className="text-[12px] text-ink-3">
+                      {weekdayOf(j.date)}
+                    </span>
+                  </div>
+                  <p className="mt-1 line-clamp-2 text-small text-ink-2">
+                    {summaryOf(j)}
+                  </p>
+                </button>
+              ))}
+            </section>
+          ))}
         </>
-      )}
-
-      {!journals?.length && (
+      ) : (
         <EmptyState
-          quote="一天一页，记下今天真正发生了什么。"
-          hint="不用写得漂亮，写得真实就行。"
+          quote="还没有日志"
+          hint="一天五分钟，记下今天真正发生了什么"
+          action={{
+            label: '写今天的',
+            onClick: () => navigate({ name: 'journalEntry', date: today }),
+          }}
         />
       )}
+
+      {/* 补写入口：温和地放在最下面，不制造压力 */}
+      {missed.length > 0 && (
+        <div className="mt-8 px-5">
+          <button
+            onClick={() => {
+              haptics.tap();
+              setPickOpen(true);
+            }}
+            className="tap flex items-center gap-1.5 text-small text-ink-3"
+          >
+            漏了几天？
+            <span className="text-accent">补一个</span>
+            <Icon name="right" size={13} className="text-ink-3" />
+          </button>
+        </div>
+      )}
+
+      <Sheet
+        open={pickOpen}
+        onClose={() => setPickOpen(false)}
+        title="补哪一天"
+        subtitle="挑一个就行，不用全补"
+      >
+        <div className="pb-2">
+          {missed.map((d) => (
+            <button
+              key={d}
+              onClick={() => {
+                haptics.tap();
+                setPickOpen(false);
+                navigate({ name: 'journalEntry', date: d });
+              }}
+              className="row-tap flex w-full items-center gap-3 border-b border-rule py-3.5 text-left"
+            >
+              <span className="editorial w-[52px] shrink-0 text-[15px] text-ink">
+                {relativeDay(d)}
+              </span>
+              <span className="flex-1 text-small text-ink-2">
+                {fmtDateShort(d)} {weekdayOf(d)}
+              </span>
+              <Icon name="right" size={15} className="shrink-0 text-ink-3" />
+            </button>
+          ))}
+        </div>
+      </Sheet>
     </div>
   );
 }

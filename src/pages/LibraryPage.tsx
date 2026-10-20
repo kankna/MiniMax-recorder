@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
 import type { Note } from '../db/types';
 import { fmtDateShort } from '../lib/date';
+import { haptics } from '../lib/haptics';
 import { useApp } from '../store/useApp';
 import { Masthead, IconButton } from '../components/Masthead';
 import { EmptyState } from '../components/EmptyState';
@@ -72,7 +73,10 @@ export function LibraryPage() {
         ).map(([k, label]) => (
           <button
             key={k}
-            onClick={() => setFilter(k)}
+            onClick={() => {
+              haptics.tap();
+              setFilter(k);
+            }}
             className={`tap rounded-full border px-3.5 py-1.5 text-[13px] transition-colors ${
               filter === k
                 ? 'border-accent bg-accent-soft text-accent'
@@ -84,7 +88,10 @@ export function LibraryPage() {
         ))}
 
         <button
-          onClick={() => navigate({ name: 'noteEditor' })}
+          onClick={() => {
+            haptics.tap();
+            navigate({ name: 'noteEditor' });
+          }}
           className="tap ml-auto flex items-center gap-1 rounded-full bg-accent px-3.5 py-1.5 text-[13px] font-medium text-accent-ink"
         >
           <Icon name="plus" size={14} strokeWidth={2} /> 新笔记
@@ -107,12 +114,8 @@ export function LibraryPage() {
 
       {list.length === 0 ? (
         <EmptyState
-          quote={
-            filter === 'active'
-              ? '库还是空的。'
-              : '这个筛选下什么都没有。'
-          }
-          hint="从速记里挑几条，固化成笔记。周末整理时，别忘了把最重要的那个发现也提出来。"
+          quote="库还是空的"
+          hint="从速记里挑几条，固化成笔记。周末整理时，别忘了把最重要的那个发现也提出来"
           action={{ label: '去速记里挑', onClick: () => navigate({ name: 'inbox' }) }}
         />
       ) : (
@@ -126,8 +129,11 @@ export function LibraryPage() {
               {items.map((n) => (
                 <button
                   key={n.id}
-                  onClick={() => navigate({ name: 'noteEditor', id: n.id })}
-                  className="tap block w-full border-b border-rule px-5 py-3.5 text-left"
+                  onClick={() => {
+                    haptics.tap();
+                    navigate({ name: 'noteEditor', id: n.id });
+                  }}
+                  className="row-tap block w-full border-b border-rule px-5 py-3.5 text-left"
                 >
                   <div className="flex items-baseline gap-3">
                     <h3 className="editorial flex-1 text-[16px] leading-snug text-ink">

@@ -9,16 +9,20 @@ interface EmptyStateProps {
 
 export function EmptyState({ quote, hint, action, children }: EmptyStateProps) {
   return (
-    <div className="animate-settle flex flex-col items-center px-8 pt-20 pb-10 text-center">
-      <div className="mb-5 h-px w-10 bg-rule-2" />
-      <p className="editorial max-w-[20rem] text-balance text-[19px] leading-[1.6] text-ink-2">
+    <div className="animate-settle flex min-h-[48vh] flex-col items-center justify-center px-8 pb-8 text-center">
+      <div className="mb-6 h-px w-10 bg-rule-2" />
+      <p className="editorial max-w-[19rem] text-balance text-[21px] leading-[1.6] text-ink-2">
         {quote}
       </p>
-      {hint && <p className="mt-3 max-w-[20rem] text-balance text-small text-ink-3">{hint}</p>}
+      {hint && (
+        <p className="mt-3 max-w-[20rem] text-balance text-small leading-relaxed text-ink-3">
+          {hint}
+        </p>
+      )}
       {action && (
         <button
           onClick={action.onClick}
-          className="tap mt-6 rounded-full border border-rule-2 bg-raised px-5 py-2.5 text-small font-medium text-ink"
+          className="tap mt-7 rounded-full border border-rule-2 bg-raised px-6 py-2.5 text-small font-medium text-ink"
         >
           {action.label}
         </button>

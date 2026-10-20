@@ -100,76 +100,76 @@ export function CaptureBar() {
   return (
     <div className="px-4">
       <div
-        className={`capture-field relative overflow-hidden rounded-card border border-rule bg-field transition-colors ${
+        className={`capture-field relative overflow-hidden rounded-card border border-rule bg-field px-3 py-2.5 transition-colors ${
           listening ? 'border-accent' : ''
         } ${sweeping ? 'send-sweep' : ''}`}
       >
-        <div className="flex items-end gap-2 px-3 py-2.5">
-          <textarea
-            ref={taRef}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
-                e.preventDefault();
-                void send();
-              }
-            }}
-            rows={1}
-            enterKeyHint="send"
-            aria-label="速记"
-            placeholder="想到什么，先记下来"
-            className={`max-h-[132px] min-h-[26px] flex-1 bg-transparent text-body text-ink placeholder:text-ink-3/70 ${
-              leaving ? 'animate-send' : ''
-            }`}
-          />
+        <textarea
+          ref={taRef}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+              e.preventDefault();
+              void send();
+            }
+          }}
+          rows={1}
+          enterKeyHint="send"
+          aria-label="速记"
+          placeholder="想到什么，先记下来"
+          className={`block max-h-[132px] w-full resize-none bg-transparent text-body text-ink placeholder:text-ink-3/70 ${
+            text.trim() ? 'pr-[92px] text-left' : 'text-center'
+          } ${leaving ? 'animate-send' : ''}`}
+        />
 
-          <div className="flex shrink-0 items-center gap-1 pb-0.5">
-            {SpeechCtor && (
-              <button
-                onClick={toggleVoice}
-                aria-label={listening ? '停止语音输入' : '语音输入'}
-                className={`tap grid h-9 w-9 place-items-center rounded-full transition-colors ${
-                  listening ? 'bg-accent text-accent-ink' : 'text-ink-3'
-                }`}
-              >
-                <svg
-                  width="17"
-                  height="17"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="9" y="3" width="6" height="11" rx="3" />
-                  <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3" />
-                </svg>
-              </button>
-            )}
-
+        {/* 工具浮在纸条右侧：空态时提示语才能在整个纸条上居中 */}
+        <div className="absolute right-3 bottom-2.5 flex items-center gap-1">
+          {SpeechCtor && (
             <button
-              onClick={() => void send()}
-              disabled={!text.trim()}
-              aria-label={sent ? '已记录' : '记录'}
-              className={`tap grid h-9 w-9 place-items-center rounded-full transition-all duration-200 ${
-                sent
-                  ? 'bg-accent text-accent-ink'
-                  : text.trim()
-                    ? 'bg-accent text-accent-ink'
-                    : 'bg-rule/60 text-ink-3'
+              onClick={() => {
+                haptics.tap();
+                toggleVoice();
+              }}
+              aria-label={listening ? '停止语音输入' : '语音输入'}
+              className={`tap grid h-9 w-9 place-items-center rounded-full transition-colors ${
+                listening ? 'bg-accent text-accent-ink' : 'text-ink-3'
               }`}
             >
-              {sent ? (
-                <span key="check" className="sent-check grid place-items-center">
-                  <Icon name="check" size={18} strokeWidth={2.4} />
-                </span>
-              ) : (
-                <Icon name="arrowUp" size={18} strokeWidth={1.8} />
-              )}
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="9" y="3" width="6" height="11" rx="3" />
+                <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3" />
+              </svg>
             </button>
-          </div>
+          )}
+
+          <button
+            onClick={() => void send()}
+            disabled={!text.trim()}
+            aria-label={sent ? '已记录' : '记录'}
+            className={`tap grid h-9 w-9 place-items-center rounded-full transition-all duration-200 ${
+              sent || text.trim()
+                ? 'bg-accent text-accent-ink'
+                : 'bg-rule/60 text-ink-3'
+            }`}
+          >
+            {sent ? (
+              <span key="check" className="sent-check grid place-items-center">
+                <Icon name="check" size={18} strokeWidth={2.4} />
+              </span>
+            ) : (
+              <Icon name="arrowUp" size={18} strokeWidth={1.8} />
+            )}
+          </button>
         </div>
       </div>
 

@@ -165,8 +165,8 @@ export function InboxPage() {
 
       {captures.length === 0 ? (
         <EmptyState
-          quote="纸是空的。想到什么，先记下来。"
-          hint="不必整理，不必分类 —— 整理是周末的事。"
+          quote="纸是空的，想到什么先记下来"
+          hint="不必整理，不必分类 —— 整理是周末的事"
         />
       ) : (
         <div className="mt-5">

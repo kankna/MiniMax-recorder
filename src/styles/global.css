@@ -159,13 +159,22 @@
   /* —— 按下反馈 —— */
   .tap {
     transition:
-      transform 120ms var(--ease-out-soft),
+      transform 130ms var(--ease-out-soft),
       background-color 160ms var(--ease-out-soft),
       border-color 160ms var(--ease-out-soft),
+      color 160ms var(--ease-out-soft),
       opacity 160ms var(--ease-out-soft);
   }
   .tap:active {
-    transform: scale(0.975);
+    transform: scale(0.955);
+  }
+
+  /* —— 列表行按下：泛起一层极淡的墨色 —— */
+  .row-tap {
+    transition: background-color 140ms var(--ease-out-soft);
+  }
+  .row-tap:active {
+    background: color-mix(in srgb, var(--c-accent) 8%, transparent);
   }
 
   /* —— 底部弹层 —— */
@@ -337,6 +346,17 @@
   }
 }
 
+/* 列表进场：只位移，不动透明度。
+   动画被系统节流时，条目最多偏几像素，绝不会停在 opacity 0 上隐身。 */
+@keyframes slide-in {
+  from {
+    transform: translateY(10px);
+  }
+  to {
+    transform: none;
+  }
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -366,17 +386,16 @@
   }
 }
 
-/* 落笔：一条速记刚写进纸里的那一下 */
+/* 落笔：一条速记刚写进纸里的那一下。
+   同样只动位置 —— 墨色晕染交给 ::after，不影响文字可读性。 */
 @keyframes land {
   0% {
-    opacity: 0;
     transform: translateY(-16px) scale(0.97);
   }
   55% {
-    opacity: 1;
+    transform: translateY(0) scale(1.005);
   }
   100% {
-    opacity: 1;
     transform: none;
   }
 }
@@ -488,6 +507,34 @@
   animation: settle 300ms var(--ease-out-soft) both;
 }
 
+/* 切页动效：往里走从下方来，退回去从上方来。
+   只动位置不动透明度 —— 万一被系统节流，内容也始终清晰可读。 */
+@keyframes enter-fwd {
+  from {
+    transform: translateY(11px);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes enter-back {
+  from {
+    transform: translateY(-11px);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.animate-enter {
+  animation: enter-fwd 300ms var(--ease-out-soft) both;
+}
+
+.animate-enter-back {
+  animation: enter-back 300ms var(--ease-out-soft) both;
+}
+
 .animate-rise {
   animation: rise 380ms var(--ease-out-soft) both;
 }
@@ -500,7 +547,7 @@
 
 /* 列表进场：逐项错开，节奏要轻 */
 .stagger > * {
-  animation: rise 420ms var(--ease-out-soft) both;
+  animation: slide-in 420ms var(--ease-out-soft) both;
 }
 .stagger > *:nth-child(1) {
   animation-delay: 0ms;

@@ -12,10 +12,10 @@ import type { Colorway, Mode } from '../db/types';
 import { buildZip, deliverBlob, readPayloadFromFile, stamp } from '../lib/export';
 import { AI_PRESETS, testConnection } from '../lib/ai';
 import { dayDiff, todayKey } from '../lib/date';
+import { haptics } from '../lib/haptics';
 import { useApp } from '../store/useApp';
 import { Masthead } from '../components/Masthead';
 import { Icon } from '../components/Icons';
-import { haptics } from '../lib/haptics';
 
 const COLORWAYS: { key: Colorway; name: string; swatch: [string, string, string] }[] = [
   { key: 'ink', name: '墨', swatch: ['#f6f3ec', '#2c6e5a', '#1a1714'] },
@@ -153,7 +153,10 @@ export function SettingsPage() {
             return (
               <button
                 key={c.key}
-                onClick={() => void setTheme({ colorway: c.key })}
+                onClick={() => {
+                  haptics.tap();
+                  void setTheme({ colorway: c.key });
+                }}
                 className={`tap flex flex-1 flex-col items-center gap-2 rounded-card border p-3 transition-colors ${
                   on ? 'border-accent bg-accent-soft' : 'border-rule bg-raised'
                 }`}
@@ -183,7 +186,10 @@ export function SettingsPage() {
             return (
               <button
                 key={m.key}
-                onClick={() => void setTheme({ mode: m.key })}
+                onClick={() => {
+                  haptics.tap();
+                  void setTheme({ mode: m.key });
+                }}
                 className={`tap flex flex-1 items-center justify-center gap-1.5 rounded-field border py-2.5 text-small transition-colors ${
                   on
                     ? 'border-accent bg-accent-soft text-accent'

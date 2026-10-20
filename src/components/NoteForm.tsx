@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactNode } from 'react';
 import { Sheet } from './Sheet';
 import { Icon } from './Icons';
 import { Markdown } from './Markdown';
+import { haptics } from '../lib/haptics';
 
 export interface NoteDraft {
   title: string;
@@ -134,7 +135,10 @@ export function NoteForm({
               {tops.map((t) => (
                 <button
                   key={t}
-                  onClick={() => setTop(t)}
+                  onClick={() => {
+                    haptics.tap();
+                    setTop(t);
+                  }}
                   className={`tap rounded-full border px-3.5 py-1.5 text-small transition-colors ${
                     top === t
                       ? 'border-accent bg-accent text-accent-ink'
@@ -152,7 +156,10 @@ export function NoteForm({
                 return (
                   <button
                     key={value}
-                    onClick={() => pickCategory(value)}
+                    onClick={() => {
+                      haptics.tap();
+                      pickCategory(value);
+                    }}
                     className={`tap rounded-full border px-3 py-1 text-[13px] transition-colors ${
                       on
                         ? 'border-accent bg-accent-soft text-accent'
