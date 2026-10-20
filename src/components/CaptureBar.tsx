@@ -79,7 +79,7 @@ export function CaptureBar() {
   return (
     <div className="px-4">
       <div
-        className={`capture-field ruled relative rounded-card border border-rule bg-field transition-colors ${
+        className={`capture-field relative rounded-card border border-rule bg-field transition-colors ${
           listening ? 'border-accent' : ''
         }`}
       >

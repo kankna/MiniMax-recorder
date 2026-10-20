@@ -154,17 +154,7 @@
     box-shadow: inset 2px 0 0 color-mix(in srgb, var(--c-margin) 55%, transparent);
   }
 
-  /* —— 横格纸：速记输入条背后的淡格线 —— */
-  .ruled {
-    background-image: repeating-linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent 27px,
-      var(--c-rule) 27px,
-      var(--c-rule) 28px
-    );
-    background-position: 0 0;
-  }
+  /* —— 捕获纸条：干净的一张纸。格线会横穿占位文字，像被划掉了，索性不要 —— */
 
   /* —— 按下反馈 —— */
   .tap {
