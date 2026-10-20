@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>私人档案 · Recorder</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #f6f3ec;
+        color: #1a1714;
+        font-family: system-ui, -apple-system, 'PingFang SC', 'Noto Sans CJK SC',
+          'Microsoft YaHei', sans-serif;
+        display: grid;
+        place-items: center;
+      }
+      p {
+        font-size: 14px;
+        color: #6b6359;
+        letter-spacing: 0.04em;
+      }
+    </style>
+  </head>
+  <body>
+    <p>正在进入私人档案…</p>
+    <script>
+      /*
+        GitHub Pages 对不存在的路径会返回这张 404.html。
+        分享进速记的链接（…/share?text=…）在 Service Worker 还没装上时
+        会落到这里 —— 所以把地址栏里的查询参数原样带回应用首页，
+        应用就会把它收进 inbox。
+      */
+      (function () {
+        var q = location.search + location.hash;
+        var segs = location.pathname.split('/').filter(Boolean);
+        var base = segs.length > 1 ? '/' + segs[0] + '/' : '/';
+
+        // 若 Service Worker 已注册，用它的 scope 定位最准（换域名也不会失效）
+        if (navigator.serviceWorker && navigator.serviceWorker.getRegistration) {
+          navigator.serviceWorker
+            .getRegistration()
+            .then(function (reg) {
+              if (reg && reg.scope) base = reg.scope;
+              location.replace(base + q.replace(/^\//, ''));
+            })
+            .catch(function () {
+              location.replace(base + q.replace(/^\//, ''));
+            });
+        } else {
+          location.replace(base + q.replace(/^\//, ''));
+        }
+      })();
+    </script>
+  </body>
+</html>

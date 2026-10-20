@@ -40,6 +40,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // 分享进来的地址（/share?text=…）也由 index.html 接管，
+        // 这样即便 Service Worker 还没装上，也有 404.html 兜底
         navigateFallback: 'index.html',
         cleanupOutdatedCaches: true,
         clientsClaim: false,
