@@ -1,0 +1,166 @@
+@import 'tailwindcss';
+
+/* ============================================================
+   私人档案 · 设计令牌
+   纸与墨的档案室。纸面为底、墨色为字、发丝线为界，一点朱红为记号。
+   三套配色（墨 / 霁 / 陶）× 明暗两态，全部可在设置中切换。
+   ============================================================ */
+
+/* ---------- 墨 Ink：暖白纸 · 墨绿（默认） ---------- */
+[data-colorway='ink'] {
+  --c-paper: #f6f3ec;
+  --c-raised: #fffdf8;
+  --c-field: #fffdf7;
+  --c-ink: #1a1714;
+  --c-ink-2: #6b6359;
+  --c-ink-3: #9c9287;
+  --c-rule: #e2dacb;
+  --c-rule-2: #d2c8b5;
+  --c-accent: #2c6e5a;
+  --c-accent-ink: #fffdf8;
+  --c-accent-soft: #e6efe9;
+  --c-margin: #b24a3d;
+  --c-shadow: 30 25 17;
+  --c-grain: 0.05;
+}
+
+/* ---------- 霁 Slate：冷白纸 · 靛蓝 ---------- */
+[data-colorway='slate'] {
+  --c-paper: #f1f3f6;
+  --c-raised: #fbfcfd;
+  --c-field: #fafbfc;
+  --c-ink: #12171d;
+  --c-ink-2: #5c6672;
+  --c-ink-3: #939da9;
+  --c-rule: #dce1e7;
+  --c-rule-2: #c4ccd5;
+  --c-accent: #2d4e7e;
+  --c-accent-ink: #fbfcfd;
+  --c-accent-soft: #e4eaf2;
+  --c-margin: #a6492f;
+  --c-shadow: 18 24 33;
+  --c-grain: 0.035;
+}
+
+/* ---------- 陶 Clay：骨白纸 · 赤陶 ---------- */
+[data-colorway='clay'] {
+  --c-paper: #f5eee2;
+  --c-raised: #fdf8ef;
+  --c-field: #fdf9f0;
+  --c-ink: #241b13;
+  --c-ink-2: #6e6152;
+  --c-ink-3: #a2967f;
+  --c-rule: #e4d8c4;
+  --c-rule-2: #d4c3a9;
+  --c-accent: #a24e2b;
+  --c-accent-ink: #fdf8ef;
+  --c-accent-soft: #f3e4d7;
+  --c-margin: #5f6b3a;
+  --c-shadow: 40 30 18;
+  --c-grain: 0.055;
+}
+
+/* ---------- 墨 · 夜 ---------- */
+[data-colorway='ink'][data-mode='dark'] {
+  --c-paper: #16140f;
+  --c-raised: #1e1b16;
+  --c-field: #1a1712;
+  --c-ink: #efe9dd;
+  --c-ink-2: #a29a8c;
+  --c-ink-3: #6f685c;
+  --c-rule: #2e2a23;
+  --c-rule-2: #423c32;
+  --c-accent: #62bfa0;
+  --c-accent-ink: #0e2a22;
+  --c-accent-soft: #1b2a25;
+  --c-margin: #d3735f;
+  --c-shadow: 0 0 0;
+  --c-grain: 0.09;
+}
+
+/* ---------- 霁 · 夜 ---------- */
+[data-colorway='slate'][data-mode='dark'] {
+  --c-paper: #101317;
+  --c-raised: #181c21;
+  --c-field: #14181c;
+  --c-ink: #e8ecf1;
+  --c-ink-2: #98a2ae;
+  --c-ink-3: #67717d;
+  --c-rule: #242a31;
+  --c-rule-2: #384049;
+  --c-accent: #7ba3dc;
+  --c-accent-ink: #101f33;
+  --c-accent-soft: #1a2330;
+  --c-margin: #d2795c;
+  --c-shadow: 0 0 0;
+  --c-grain: 0.07;
+}
+
+/* ---------- 陶 · 夜 ---------- */
+[data-colorway='clay'][data-mode='dark'] {
+  --c-paper: #17130e;
+  --c-raised: #201a13;
+  --c-field: #1b1610;
+  --c-ink: #f0e6d6;
+  --c-ink-2: #a69884;
+  --c-ink-3: #736855;
+  --c-rule: #2e261c;
+  --c-rule-2: #443a2b;
+  --c-accent: #e08b5f;
+  --c-accent-ink: #35180a;
+  --c-accent-soft: #2b1f15;
+  --c-margin: #a3b073;
+  --c-shadow: 0 0 0;
+  --c-grain: 0.09;
+}
+
+/* ---------- Tailwind 令牌映射 ---------- */
+@theme inline {
+  --color-paper: var(--c-paper);
+  --color-raised: var(--c-raised);
+  --color-field: var(--c-field);
+  --color-ink: var(--c-ink);
+  --color-ink-2: var(--c-ink-2);
+  --color-ink-3: var(--c-ink-3);
+  --color-rule: var(--c-rule);
+  --color-rule-2: var(--c-rule-2);
+  --color-accent: var(--c-accent);
+  --color-accent-ink: var(--c-accent-ink);
+  --color-accent-soft: var(--c-accent-soft);
+  --color-margin: var(--c-margin);
+}
+
+@theme {
+  --font-sans:
+    'Instrument Sans', ui-sans-serif, -apple-system, 'PingFang SC', 'HarmonyOS Sans SC',
+    'Noto Sans CJK SC', 'Source Han Sans SC', 'Microsoft YaHei', sans-serif;
+  --font-serif:
+    'Newsreader', 'Noto Serif', 'Noto Serif CJK SC', 'Source Han Serif SC', 'Songti SC',
+    'STSong', 'SimSun', serif;
+
+  --text-micro: 0.6875rem;
+  --text-micro--line-height: 1.45;
+  --text-small: 0.8125rem;
+  --text-small--line-height: 1.5;
+  --text-body: 1rem;
+  --text-body--line-height: 1.65;
+  --text-lede: 1.0625rem;
+  --text-lede--line-height: 1.6;
+  --text-title: 1.3125rem;
+  --text-title--line-height: 1.32;
+  --text-display: 1.875rem;
+  --text-display--line-height: 1.12;
+
+  --tracking-caps: 0.16em;
+  --tracking-tight: -0.012em;
+
+  --radius-field: 10px;
+  --radius-card: 14px;
+  --radius-sheet: 22px;
+
+  --shadow-lift:
+    0 1px 2px rgb(var(--c-shadow) / 0.05), 0 10px 34px rgb(var(--c-shadow) / 0.1);
+  --shadow-sheet: 0 -2px 40px rgb(var(--c-shadow) / 0.16);
+
+  --ease-out-soft: cubic-bezier(0.22, 0.9, 0.24, 1);
+}

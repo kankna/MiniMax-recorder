@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN" data-colorway="ink" data-mode="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>私人档案 · Recorder</title>
+    <meta name="description" content="速记 → 日志 → 知识，三层私人记录系统。" />
+
+    <meta name="theme-color" content="#F6F3EC" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#16140F" media="(prefers-color-scheme: dark)" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="档案" />
+
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+
+    <script>
+      // 在首帧前套用主题，避免闪烁。主题以 localStorage 为准（同步、不可丢）。
+      (function () {
+        try {
+          var t = JSON.parse(localStorage.getItem('recorder:theme') || '{}');
+          var root = document.documentElement;
+          var mode = t.mode || 'auto';
+          root.setAttribute('data-colorway', t.colorway || 'ink');
+          root.setAttribute(
+            'data-mode',
+            mode === 'auto'
+              ? window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light'
+              : mode,
+          );
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
